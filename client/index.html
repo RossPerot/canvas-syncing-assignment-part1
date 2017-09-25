@@ -2,12 +2,51 @@
 <html lang="en">
 <head>
     <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script type="text/babel" >
         "use strict";
     
+        let socket;
+        let myNum = 0;
+        let totalScore;
+        
+        const setupSocket = () => {
+            socket.on('updatedScore', (data) => {
+                document.querySelector("#totalScore").innerHTML = data;
+            });
+            
+            socket.on('clearScore', (data) => {
+               document.querySelector("totalScore").innerHTML = ""; 
+            });
+        }
+        
+        const sendMessage = () => {
+            myNum += 5;
+            
+            let messageData = {
+                message:myNum
+            };
+            
+            socket.emit('updateScore', 5);
+        }
+        
+        const init = () => {
+            socket = io.connect();
+            
+            document.querySelector("#totalScore").innerHTML = "0";
+            
+            socket.on('connect', () =>{
+                setInterval(sendMessage, 2000); 
+            });
+            
+            setupSocket();
+        }
+        
+        window.onload = init;
+
     </script>
 </head>
 <body>
-
+    <h2>Total Score: <span id="totalScore"></span></h2>
 </body>
 </html>
